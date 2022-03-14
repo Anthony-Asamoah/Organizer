@@ -1,0 +1,90 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>To-Do-List</title>
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <script type="text/javascript" src="{% static 'js/bootstrap.js' %}"></script>
+{#    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>#}
+{#    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>#}
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+</head>
+<body>
+    <div class="container" id="container">
+        <div class="header">
+            <h1>Tasks for {{ today }}</h1>
+        </div>
+        <div class="tasklist">
+            <button class="new_task" type="button" onclick="open_form()">New...</button>
+            <ol>
+            {% if not task %}
+                <div class="empty">
+                    <h3 class="empty">Nothing to do for today..</h3>
+                    <hr />
+                    <h4>Add a new task or take a nap, go for a walk or read a book :)</h4>
+                </div>
+
+            {% else %}
+                <ul>
+                {% for i in task %}
+                    {% if not i.due %}
+                        <li>
+                            <span>
+                            <button id="delete" onclick="open_complete({{i.id}})">{{ i.priority }}</button>
+                            </span> {{ i.title }}
+
+                            {% if i.notes %}
+                                <div class="note">
+                                    <p>- {{ i.notes }}</p>
+                                </div>
+                            {% endif %}
+
+                        </li>
+                    {% elif i.due %}
+                        <li><span>
+                            <button id="delete" onclick="open_complete({{i.id}})">{{ i.priority }}</button>
+                             Due by {{ i.due }}
+                        </span> {{ i.title }}
+
+                        {% if i.notes %}
+                                <p>{{ i.notes }}</p>
+                            {% endif %}
+
+                        </li>
+                    {% endif %}
+                {% endfor %}
+                </ul>
+            {% endif %}
+            </ol>
+        </div>
+    </div>
+    <div class="add_task" id="new_task">
+        <h5 class="head">Details...</h5>
+        <hr/>
+        <form class="add" method="post" action="{% url 'add' %}">
+            {% csrf_token %}
+            {{ new_task }}
+            <div class="add_btn_div">
+                <button type="submit" name="submit" class="add_btn" onclick="close_form()">Add</button>
+                <button type="reset" name="cancel" class="cancel_btn" onclick="close_form()">Cancel</button>
+            </div>
+        </form>
+    </div>
+    <div class="complete_task" id="completed">
+        <h2 class="head">Kindly Confirm...</h2>
+        <form class="complete_form" method="post" action="{% url 'complete' %}">
+            {% csrf_token %}
+            <div class="complete_btn_div">
+                <input type="hidden" id="task_id" name="task_id" value="">
+                <button type="submit" name="completed" class="complete_btn" onclick="close_complete()">Completed</button>
+                <button type="button" name="cancel" class="cancel_btn" onclick="close_complete()">Not Yet</button>
+            </div>
+        </form>
+    </div>
+    <div class="footer">
+        <p><a href="https://www.instagram.com/sean_or_tony/">@Sean_or_Tony</a> {{ year }} | All Rights Reserved</p>
+    </div>
+</body>
+<script src="{% static 'js/index.js' %}"></script>
+</html>
